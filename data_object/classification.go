@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const ClassificationTable = "classification"
+const TableClassification = "classification"
 
 const FieldClassificationId = FieldId
 const FieldClassificationTitle = "title"
@@ -18,12 +18,12 @@ type Classification struct {
 	ID           uuid.UUID      `json:"id"`
 	Title        string         `json:"title"`
 	Slug         string         `json:"slug"`
-	Publications []Publication  `json:"publications"`
+	Publications []*Publication  `json:"publications"`
 	CreatedAt    time.Time      `json:"createdAt"`
 	UpdatedAt    time.Time      `json:"updatedAt"`
 	DeletedAt    time.Time `json:"deletedAt"`
 }
 
 func (c Classification) Table() string {
-	return ClassificationTable
+	return TableClassification
 }

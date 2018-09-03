@@ -5,7 +5,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-const MediaTable = "media"
+const TableMedia = "media"
 
 const FieldMediaId = FieldId
 const FieldMediaType = "type"
@@ -33,5 +33,5 @@ type Media struct {
 }
 
 func (m Media) Table() string {
-	return MediaTable
+	return TableMedia
 }

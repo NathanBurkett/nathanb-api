@@ -5,7 +5,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-const ContentBlockTable = "content_block"
+const TableContentBlock = "content_block"
 
 const FieldContentBlockID = FieldId
 const FieldContentBlockType = "type"
@@ -28,5 +28,5 @@ type ContentBlock struct {
 }
 
 func (cb ContentBlock) Table() string {
-	return ContentBlockTable
+	return TableContentBlock
 }

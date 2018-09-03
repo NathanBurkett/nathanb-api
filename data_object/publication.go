@@ -5,7 +5,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-const PublicationTable = "publication"
+const TablePublication = "publication"
 
 const FieldPublicationId = FieldId
 const FieldPublicationTitle = "title"
@@ -32,5 +32,5 @@ type Publication struct {
 }
 
 func (p Publication) Table() string {
-	return PublicationTable
+	return TablePublication
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-const UserTable = "user"
+const TableUser = "user"
 
 const FieldUserId = FieldId
 const FieldUserEmail = "email"
@@ -26,5 +26,5 @@ type User struct {
 }
 
 func (u User) Table() string {
-	return UserTable
+	return TableUser
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-const ProfileTable = "profile"
+const TableProfile = "profile"
 
 const FieldProfileId = FieldId
 const FieldProfileFirstName = "first_name"
@@ -29,5 +29,5 @@ type Profile struct {
 }
 
 func (p Profile) Table() string {
-	return ProfileTable
+	return TableProfile
 }
