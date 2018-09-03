@@ -3,6 +3,7 @@ package main
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"github.com/nathanburkett/nathanb-api/http"
 	"github.com/nathanburkett/nathanb-api/app"
 	"github.com/nathanburkett/nathanb-api/env"
 	"fmt"
@@ -22,6 +23,10 @@ func main() {
 
 	standard := schema_standard.Definition{}
 	instance.SetSchema(parseSchema(standard, dataSource.DB()))
+
+	router := http.NewRouter(instance).Attach().Mount()
+
+	log.Fatalf("ListenAndServe err: %v", router.ListenAndServe(getHostAndPort()))
 }
 
 func getHostAndPort() string {
