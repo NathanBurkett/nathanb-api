@@ -1,2 +1,5 @@
+schema_admin/assets.go
+schema_standard/assets.go
+
 vendor/
 main
