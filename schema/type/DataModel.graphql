@@ -1,0 +1,6 @@
+interface DataModel {
+    id: ID!
+    createdAt: Time!
+    updatedAt: Time!
+    deletedAt: Time!
+}

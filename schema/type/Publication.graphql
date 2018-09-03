@@ -1,0 +1,14 @@
+type Publication implements DataModel {
+    id: ID!
+    title: String!
+    slug: String!
+    # classification: Classification!
+    # contentBlocks: [ContentBlock]!
+    # categories: [Category]!
+    # media: [Media]!
+    # users: [User]!
+    publishedAt: Time!
+    createdAt: Time!
+    updatedAt: Time!
+    deletedAt: Time!
+}

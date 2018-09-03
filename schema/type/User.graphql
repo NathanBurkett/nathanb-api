@@ -1,0 +1,8 @@
+type User implements DataModel {
+    id: ID!
+    profile: Profile!
+    publications: [Publication]!
+    createdAt: Time!
+    updatedAt: Time!
+    deletedAt: Time!
+}

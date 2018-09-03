@@ -1,0 +1,11 @@
+
+type Profile implements DataModel {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    twitterHandle: String!
+    githubHandle: String!
+    createdAt: Time!
+    updatedAt: Time!
+    deletedAt: Time!
+}

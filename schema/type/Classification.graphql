@@ -1,0 +1,9 @@
+type Classification implements DataModel {
+    id: ID!
+    title: String!
+    slug: String!
+    publications: [Publication]!
+    createdAt: Time!
+    updatedAt: Time!
+    deletedAt: Time!
+}

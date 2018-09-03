@@ -1,0 +1,10 @@
+type ContentBlock implements DataModel {
+    id: ID!
+    type: String!
+    content: String
+    order: Int!
+    publication: Publication!
+    createdAt: Time!
+    updatedAt: Time!
+    deletedAt: Time!
+}

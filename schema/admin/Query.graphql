@@ -1,0 +1,16 @@
+type Query {
+    category: Category
+    categories: [Category]!
+    classification: Classification
+    classifications: [Classification]!
+    contentBlock: ContentBlock
+    contentBlocks: [ContentBlock]!
+    media: Media
+    medias: [Media]!
+    profile: Profile
+    profiles: [Profile]!
+    publication: Publication
+    publications: [Publication]!
+    user: User
+    users: [User]!
+}

@@ -1,0 +1,13 @@
+type Media implements DataModel {
+    id: ID!
+    type: String!
+    subtype: String
+    title: String!
+    path: String!
+    alt: String
+    aspectRatio: String!
+    publications: [Publication]!
+    createdAt: Time!
+    updatedAt: Time!
+    deletedAt: Time!
+}
