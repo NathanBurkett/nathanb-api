@@ -10,6 +10,8 @@ import (
 	"github.com/nathanburkett/nathanb-api/data"
 	"github.com/nathanburkett/nathanb-api/schema_standard"
 	"github.com/jmoiron/sqlx"
+	"github.com/nathanburkett/nathanb-api/resolver"
+	"github.com/nathanburkett/graphql-go"
 )
 
 func main() {
