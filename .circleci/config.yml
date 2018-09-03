@@ -1,0 +1,50 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11.0
+    working_directory: /go/src/github.com/nathanburkett/nathanb-api
+    steps:
+      - checkout
+
+      - run:
+          name: Install 'dep'
+          command: |
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
+      - restore_cache:
+          keys:
+            - dep-cache-{{ checksum "Gopkg.lock" }}
+
+      - run:
+          name: Install Go dependencies
+          command: |
+            dep ensure
+
+      - save_cache:
+          key: dep-cache-{{ checksum "Gopkg.lock" }}
+          paths:
+            - vendor
+
+      - run:
+          name: Install test dependencies
+          command: |
+            go get -v -t -d ./...
+            go get -u github.com/jteeuwen/go-bindata/...
+
+      - run:
+          name: Set environment
+          command: |
+            export DB_DSN=
+            export APP_HOST=
+            export APP_PORT=
+
+      - run:
+          name: Generate the schema
+          command: |
+            make schema
+
+      - run:
+          name: Run tests
+          command: |
+            make coverage

@@ -26,7 +26,7 @@
   branch = "master"
   name = "github.com/lann/builder"
   packages = ["."]
-  revision = "1b87b36280d04fe7882d1512bf038ea2967ad534"
+  revision = "47ae307949d02aa1f1069fdafc00ca08e1dbabac"
 
 [[projects]]
   branch = "master"
@@ -75,7 +75,7 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "3673e40ba22529d22c3fd7c93e97b0ce50fa7bdd"
+  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -86,6 +86,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b963f6ea8abd11f100f5d72be02f15335846e48b59de18778690092caeffa2fa"
+  inputs-digest = "8d7808eb413e8ae8a8b7f0aa8f1176128b2a2e17ac40efa3d8540465e4c4bd08"
   solver-name = "gps-cdcl"
   solver-version = 1

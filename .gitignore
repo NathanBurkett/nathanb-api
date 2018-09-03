@@ -3,3 +3,5 @@ schema_standard/assets.go
 
 vendor/
 main
+
+test-coverage/output/
