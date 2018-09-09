@@ -23,8 +23,8 @@ type FirstCategoryArgs struct {
 
 type categoryInterpretation struct {}
 
-func (ci categoryInterpretation) handleArgs(c *Criteria, args interface{}) {
-	if c.err != nil {
+func (ci categoryInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
+	if c.Error() != nil {
 		return
 	}
 
@@ -36,11 +36,11 @@ func (ci categoryInterpretation) handleArgs(c *Criteria, args interface{}) {
 		ci.interpretAllCategoryArgs(c, args)
 		break
 	default:
-		c.err = fmt.Errorf("unknown category argument type: %s", T)
+		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
 	}
 }
 
-func (ci categoryInterpretation) interpretFirstCategoryArgs(c *Criteria, args interface{}) {
+func (ci categoryInterpretation) interpretFirstCategoryArgs(c AbstractCriteria, args interface{}) {
 	firstArgs := args.(FirstCategoryArgs)
 
 	if firstArgs.ID != nil {
@@ -56,7 +56,7 @@ func (ci categoryInterpretation) interpretFirstCategoryArgs(c *Criteria, args in
 	}
 }
 
-func (ci categoryInterpretation) interpretAllCategoryArgs(c *Criteria, args interface{}) {
+func (ci categoryInterpretation) interpretAllCategoryArgs(c AbstractCriteria, args interface{}) {
 	allArgs := args.(PaginationArgs)
 
 	if allArgs.Limit == nil {
@@ -79,13 +79,13 @@ func (ci categoryInterpretation) interpretAllCategoryArgs(c *Criteria, args inte
 
 	if allArgs.Where != nil {
 		for key, clauses := range *allArgs.Where {
-			if c.err != nil {
+			if c.Error() != nil {
 				return
 			}
 
 			column, shouldSkip, err := ci.handleField(key)
 			if err != nil {
-				c.err = err
+				c.SetError(err)
 				return
 			}
 

@@ -1,9 +1,9 @@
 package criteria
 
 import (
+	"fmt"
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/nathanb-api/data_object"
-	"fmt"
 )
 
 type Criteria struct {
@@ -21,11 +21,11 @@ type PaginationArgs struct {
 }
 
 type InterpretationHandler interface {
-	handleArgs(*Criteria, interface{})
+	handleArgs(AbstractCriteria, interface{})
 	handleField(string) (string, bool, error)
 }
 
-func New(model data_object.Model, args interface{}, fields []string) *Criteria {
+func New(model data_object.Model, args interface{}, fields []string) AbstractCriteria {
 	cri := &Criteria{
 		builder: query.SelectBuilder{}.PlaceholderFormat(query.Question),
 	}
@@ -69,14 +69,14 @@ func (c *Criteria) determineModelInterpretation(model data_object.Model) {
 }
 
 func (c *Criteria) extractFields(fields []string) {
-	if c.err != nil {
+	if c.Error() != nil {
 		return
 	}
 
 	var columns []string
 
 	for i := 0; i < len(fields); i++ {
-		if c.err != nil {
+		if c.Error() != nil {
 			continue
 		}
 
@@ -96,36 +96,44 @@ func (c *Criteria) extractFields(fields []string) {
 	c.builder.Columns(columns...)
 }
 
-func (c *Criteria) From(table string) *Criteria {
+func (c *Criteria) From(table string) AbstractCriteria {
 	c.builder = c.builder.From(table)
 	return c
 }
 
-func (c *Criteria) Where(pred interface{}, args ...interface{}) *Criteria {
+func (c *Criteria) Where(pred interface{}, args ...interface{}) AbstractCriteria {
 	c.builder = c.builder.Where(pred, args...)
 	return c
 }
 
-func (c *Criteria) OrderBy(clauses []string) *Criteria {
+func (c *Criteria) OrderBy(clauses []string) AbstractCriteria {
 	c.builder = c.builder.OrderBy(clauses...)
 	return c
 }
 
-func (c *Criteria) Limit(limit uint64) *Criteria {
+func (c *Criteria) Limit(limit uint64) AbstractCriteria {
 	c.builder = c.builder.Limit(limit)
 	return c
 }
 
-func (c *Criteria) Offset(limit uint64) *Criteria {
+func (c *Criteria) Offset(limit uint64) AbstractCriteria {
 	c.builder = c.builder.Offset(limit)
 	return c
 }
 
-func (c *Criteria) Fields(fields ...string) *Criteria {
+func (c *Criteria) Fields(fields ...string) AbstractCriteria {
 	c.builder = c.builder.Columns(fields...)
 	return c
 }
 
 func (c *Criteria) ToSql() (string, []interface{}, error) {
 	return c.builder.ToSql()
+}
+
+func (c *Criteria) Error() error {
+	return c.err
+}
+
+func (c *Criteria) SetError(err error) {
+	c.err = err
 }

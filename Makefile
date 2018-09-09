@@ -8,8 +8,8 @@ admin-schema: $(info $(M) Generating admin schema)
 
 schema: standard-schema admin-schema
 
-test: $(info $(M) Running tests)
-	go test -race
+html-coverage: $(info $(M) Running tests w/ coverage)
+	./test-coverage/run.sh --html
 
 coverage: $(info $(M) Running tests w/ coverage)
 	./test-coverage/run.sh

@@ -16,7 +16,7 @@ const FieldProfileDeletedAt = FieldDeletedAt
 
 type profileInterpretation struct {}
 
-func (pi profileInterpretation) handleArgs(c *Criteria, args interface{}) {
+func (pi profileInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 
 }
 

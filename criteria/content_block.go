@@ -23,8 +23,8 @@ type FirstContentBlockArgs struct {
 
 type contentBlockInterpretation struct{}
 
-func (cbi contentBlockInterpretation) handleArgs(c *Criteria, args interface{}) {
-	if c.err != nil {
+func (cbi contentBlockInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
+	if c.Error() != nil {
 		return
 	}
 
@@ -36,12 +36,12 @@ func (cbi contentBlockInterpretation) handleArgs(c *Criteria, args interface{}) 
 		cbi.interpretAllContentBlockArgs(c, args)
 		break
 	default:
-		c.err = fmt.Errorf("unknown content block argument type: %s", T)
+		c.SetError(fmt.Errorf("unknown content block argument type: %s", T))
 	}
 
 }
 
-func (cbi contentBlockInterpretation) interpretFirstContentBlockArgs(c *Criteria, args interface{}) {
+func (cbi contentBlockInterpretation) interpretFirstContentBlockArgs(c AbstractCriteria, args interface{}) {
 	firstArgs := args.(FirstContentBlockArgs)
 
 	if firstArgs.ID != nil {
@@ -53,7 +53,7 @@ func (cbi contentBlockInterpretation) interpretFirstContentBlockArgs(c *Criteria
 	}
 }
 
-func (cbi contentBlockInterpretation) interpretAllContentBlockArgs(c *Criteria, args interface{}) {
+func (cbi contentBlockInterpretation) interpretAllContentBlockArgs(c AbstractCriteria, args interface{}) {
 
 }
 

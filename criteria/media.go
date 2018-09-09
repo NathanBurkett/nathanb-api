@@ -19,7 +19,7 @@ const FieldMediaPublications = "publications"
 
 type mediaInterpretation struct{}
 
-func (mi mediaInterpretation) handleArgs(c *Criteria, args interface{}) {
+func (mi mediaInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 
 }
 

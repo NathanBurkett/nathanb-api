@@ -15,7 +15,7 @@ const FieldPublicationDeletedAt = FieldDeletedAt
 
 type publicationInterpretation struct {}
 
-func (pi publicationInterpretation) handleArgs(c *Criteria, args interface{}) {
+func (pi publicationInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 
 }
 

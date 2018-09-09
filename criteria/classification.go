@@ -22,8 +22,8 @@ type FirstClassificationArgs struct {
 
 type classificationInterpretation struct{}
 
-func (cl classificationInterpretation) handleArgs(c *Criteria, args interface{}) {
-	if c.err != nil {
+func (cl classificationInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
+	if c.Error() != nil {
 		return
 	}
 
@@ -33,7 +33,7 @@ func (cl classificationInterpretation) handleArgs(c *Criteria, args interface{})
 	case PaginationArgs:
 		break
 	default:
-		c.err = fmt.Errorf("unknown classification argument type: %s", T)
+		c.SetError(fmt.Errorf("unknown classification argument type: %s", T))
 	}
 }
 

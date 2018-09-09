@@ -1,9 +1,14 @@
 package data
 
 import (
-	"log"
 	"github.com/jmoiron/sqlx"
+	"log"
 )
+
+type Database interface {
+	Get(interface{}, string, ...interface{}) error
+	Select(interface{}, string, ...interface{}) error
+}
 
 type Source struct {
 	dsn string

@@ -1,22 +1,22 @@
 package repository
 
 import (
-	"github.com/jmoiron/sqlx"
-	"github.com/nathanburkett/nathanb-api/criteria"
 	"database/sql"
+	"github.com/nathanburkett/nathanb-api/criteria"
+	"github.com/nathanburkett/nathanb-api/data"
 )
 
 type Repository struct {
-	DB *sqlx.DB
+	DB data.Database
 }
 
-func New(db *sqlx.DB) Repository {
+func New(db data.Database) Repository {
 	return Repository{
 		DB: db,
 	}
 }
 
-func (r Repository) First(dest interface{}, cri *criteria.Criteria) error {
+func (r Repository) First(dest interface{}, cri criteria.AbstractCriteria) error {
 	stmt, args, err := cri.ToSql()
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func (r Repository) First(dest interface{}, cri *criteria.Criteria) error {
 	return nil
 }
 
-func (r Repository) Find(dest interface{}, cri *criteria.Criteria) error {
+func (r Repository) Find(dest interface{}, cri criteria.AbstractCriteria) error {
 	stmt, args, err := cri.ToSql()
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (r Repository) Find(dest interface{}, cri *criteria.Criteria) error {
 	return nil
 }
 
-func (r Repository) All(dest interface{}, cri *criteria.Criteria) error {
+func (r Repository) All(dest interface{}, cri criteria.AbstractCriteria) error {
 	stmt, args, err := cri.ToSql()
 	if err != nil {
 		return err

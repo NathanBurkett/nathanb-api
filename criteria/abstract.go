@@ -64,3 +64,15 @@ func ExtractFieldsFromSelectedFields(fields []selected.SelectedField) []string {
 	}
 	return extracted
 }
+
+type AbstractCriteria interface {
+	From(table string) AbstractCriteria
+	Where(pred interface{}, args ...interface{}) AbstractCriteria
+	OrderBy(clauses []string) AbstractCriteria
+	Limit(limit uint64) AbstractCriteria
+	Offset(limit uint64) AbstractCriteria
+	Fields(fields ...string) AbstractCriteria
+	ToSql() (string, []interface{}, error)
+	Error() error
+	SetError(error)
+}

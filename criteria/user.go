@@ -14,7 +14,7 @@ const FieldUserDeletedAt = FieldDeletedAt
 
 type userInterpretation struct {}
 
-func (ui userInterpretation) handleArgs(c *Criteria, args interface{}) {
+func (ui userInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 
 }
 

@@ -2,7 +2,7 @@ package data_object
 
 import "github.com/satori/go.uuid"
 
-const PublicationUserTable = "publication_user"
+const TablePublicationUser = "publication_user"
 
 type PublicationUser struct {
 	PublicationId uuid.UUID `json:"-"`
@@ -10,5 +10,5 @@ type PublicationUser struct {
 }
 
 func (pu PublicationUser) Table() string {
-	return PublicationUserTable
+	return TablePublicationUser
 }

@@ -11,25 +11,25 @@
 
 set -e
 
-workdir=test-coverage/output
-profile="$workdir/cover.out"
-mode=atomic
+_workdir=test-coverage/output
+_profile="$_workdir/cover.out"
+_mode=count
 
 generate_cover_data() {
-    rm -rf "$workdir"
-    mkdir "$workdir"
+    rm -rf "$_workdir"
+    mkdir "$_workdir"
 
     for pkg in "$@"; do
-        f="$workdir/$(echo $pkg | tr / -).cover"
-        go test -race -covermode="$mode" -coverprofile="$f" "$pkg"
+        f="$_workdir/$(echo $pkg | tr / -).cover"
+        go test -v -covermode="$_mode" -coverprofile="$f" "$pkg"
     done
 
-    echo "mode: $mode" >"$profile"
-    grep -h -v "^mode:" "$workdir"/*.cover >>"$profile"
+    echo "mode: $_mode" >"$_profile"
+    grep -h -v "^mode:" "$_workdir"/*.cover >>"$_profile"
 }
 
 show_cover_report() {
-    go tool cover -${1}="$profile"
+    go tool cover -${1}="$_profile"
 }
 
 generate_cover_data $(go list ./...)

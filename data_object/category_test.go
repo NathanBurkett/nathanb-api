@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/satori/go.uuid"
 	"github.com/nathanburkett/nathanb-api/data_object"
+	"github.com/satori/go.uuid"
 )
 
 func TestCategory_Table(t *testing.T) {

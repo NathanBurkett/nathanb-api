@@ -4,7 +4,7 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-const CategoryPublicationTable = "category_publication"
+const TableCategoryPublication = "category_publication"
 
 type CategoryPublication struct {
 	CategoryId    uuid.UUID `json:"-"`
@@ -12,5 +12,5 @@ type CategoryPublication struct {
 }
 
 func (cp CategoryPublication) Table() string {
-	return CategoryPublicationTable
+	return TableCategoryPublication
 }
