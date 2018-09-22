@@ -16,14 +16,14 @@ type Query struct {
 
 func NewQuery(db *sqlx.DB) *Query {
 	return &Query{
-		DB:         db,
+		DB: db,
 	}
 }
 
 func (q *Query) Category(ctx context.Context, args criteria.FirstCategoryArgs, fields []selected.SelectedField) (*category, error) {
 	var cat data_object.Category
 
-	cri := criteria.New(cat, args, criteria.ExtractFieldsFromSelectedFields(fields))
+	cri := criteria.New(cat, args, fields)
 	err := repository.New(q.DB).First(&cat, cri)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -39,7 +39,7 @@ func (q *Query) Category(ctx context.Context, args criteria.FirstCategoryArgs, f
 func (q *Query) Categories(ctx context.Context, args criteria.PaginationArgs, fields []selected.SelectedField) (*[]*category, error) {
 	var cats []data_object.Category
 
-	cri := criteria.New(data_object.Category{}, args, criteria.ExtractFieldsFromSelectedFields(fields))
+	cri := criteria.New(data_object.Category{}, args, fields)
 	err := repository.New(q.DB).All(&cats, cri)
 	if err != nil {
 		if err == sql.ErrNoRows {

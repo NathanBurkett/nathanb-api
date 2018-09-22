@@ -2,7 +2,6 @@ package criteria
 
 import (
 	query "github.com/Masterminds/squirrel"
-	"github.com/nathanburkett/graphql-go/selected"
 )
 
 const FieldId = "id"
@@ -55,14 +54,6 @@ func interpretWhereClauses(key string, clauses []WhereClause) []interface{} {
 	}
 
 	return retClauses
-}
-
-func ExtractFieldsFromSelectedFields(fields []selected.SelectedField) []string {
-	var extracted []string
-	for i := 0; i < len(fields); i++ {
-		extracted = append(extracted, fields[i].Name)
-	}
-	return extracted
 }
 
 type AbstractCriteria interface {

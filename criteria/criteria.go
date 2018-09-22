@@ -3,6 +3,7 @@ package criteria
 import (
 	"fmt"
 	query "github.com/Masterminds/squirrel"
+	"github.com/nathanburkett/graphql-go/selected"
 	"github.com/nathanburkett/nathanb-api/data_object"
 )
 
@@ -25,7 +26,7 @@ type InterpretationHandler interface {
 	handleField(string) (string, bool, error)
 }
 
-func New(model data_object.Model, args interface{}, fields []string) AbstractCriteria {
+func New(model data_object.Model, args interface{}, fields []selected.SelectedField) AbstractCriteria {
 	cri := &Criteria{
 		builder: query.SelectBuilder{}.PlaceholderFormat(query.Question),
 	}
@@ -68,10 +69,12 @@ func (c *Criteria) determineModelInterpretation(model data_object.Model) {
 	}
 }
 
-func (c *Criteria) extractFields(fields []string) {
+func (c *Criteria) extractFields(selectedFields []selected.SelectedField) {
 	if c.Error() != nil {
 		return
 	}
+
+	fields := c.extractFieldsFromSelectedFields(selectedFields)
 
 	var columns []string
 
@@ -94,6 +97,14 @@ func (c *Criteria) extractFields(fields []string) {
 	}
 
 	c.builder.Columns(columns...)
+}
+
+func (c *Criteria) extractFieldsFromSelectedFields(selectedFields []selected.SelectedField) []string {
+	var extracted []string
+	for i := 0; i < len(selectedFields); i++ {
+		extracted = append(extracted, selectedFields[i].Name)
+	}
+	return extracted
 }
 
 func (c *Criteria) From(table string) AbstractCriteria {
