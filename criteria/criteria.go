@@ -1,17 +1,16 @@
 package criteria
 
 import (
-	"fmt"
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/graphql-go/selected"
 	"github.com/nathanburkett/nathanb-api/data_object"
 )
 
 type Criteria struct {
-	builder  query.SelectBuilder
-	modelType data_object.Model
-	interpretation InterpretationHandler
-	err error
+	builder     query.SelectBuilder
+	modelType   data_object.Model
+	interpreter ModelInterpreter
+	err         error
 }
 
 type PaginationArgs struct {
@@ -21,21 +20,16 @@ type PaginationArgs struct {
 	Where *map[string][]WhereClause
 }
 
-type InterpretationHandler interface {
-	handleArgs(AbstractCriteria, interface{})
-	handleField(string) (string, bool, error)
-}
-
 func New(model data_object.Model, args interface{}, fields []selected.SelectedField) AbstractCriteria {
 	cri := &Criteria{
 		builder: query.SelectBuilder{}.PlaceholderFormat(query.Question),
 	}
 
-	if cri.determineModelInterpretation(model); cri.err != nil {
+	if cri.determineModelInterpreter(model); cri.err != nil {
 		return cri
 	}
 
-	if cri.interpretation.handleArgs(cri, args); cri.err != nil {
+	if cri.interpreter.handleArgs(cri, args); cri.err != nil {
 		return cri
 	}
 
@@ -48,25 +42,15 @@ func New(model data_object.Model, args interface{}, fields []selected.SelectedFi
 	return cri
 }
 
-func (c *Criteria) determineModelInterpretation(model data_object.Model) {
-	switch T := model.(type) {
-	case data_object.Category:
-		c.interpretation = categoryInterpretation{}
-	case data_object.Classification:
-		c.interpretation = classificationInterpretation{}
-	case data_object.ContentBlock:
-		c.interpretation = contentBlockInterpretation{}
-	case data_object.Media:
-		c.interpretation = mediaInterpretation{}
-	case data_object.Profile:
-		c.interpretation = profileInterpretation{}
-	case data_object.Publication:
-		c.interpretation = publicationInterpretation{}
-	case data_object.User:
-		c.interpretation = userInterpretation{}
-	default:
-		c.err = fmt.Errorf("unknown data object type: %s", T)
+func (c *Criteria) determineModelInterpreter(model data_object.Model) {
+	factory := ModelInterpreterFactory{}
+	interpreter, err := factory.Create(model)
+	if err != nil {
+		c.err = err
+		return
 	}
+
+	c.interpreter = interpreter
 }
 
 func (c *Criteria) extractFields(selectedFields []selected.SelectedField) {
@@ -83,7 +67,7 @@ func (c *Criteria) extractFields(selectedFields []selected.SelectedField) {
 			continue
 		}
 
-		column, skip, err := c.interpretation.handleField(fields[i])
+		column, skip, err := c.interpreter.handleField(fields[i])
 		if err != nil {
 			c.err = err
 			return
