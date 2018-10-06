@@ -13,3 +13,6 @@ html-coverage: $(info $(M) Running tests w/ coverage)
 
 coverage: $(info $(M) Running tests w/ coverage)
 	./test-coverage/run.sh
+
+startApp: $(info $(M) Running application)
+	go run main.go

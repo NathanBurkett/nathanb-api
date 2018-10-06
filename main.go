@@ -1,27 +1,35 @@
 package main
 
 import (
-	_ "github.com/go-sql-driver/mysql"
-	"log"
-	"github.com/nathanburkett/nathanb-api/app"
-	"github.com/nathanburkett/nathanb-api/env"
 	"fmt"
-	"github.com/nathanburkett/nathanb-api/schema"
-	"github.com/nathanburkett/nathanb-api/data"
-	"github.com/nathanburkett/nathanb-api/schema_standard"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/nathanburkett/nathanb-api/resolver"
 	"github.com/nathanburkett/graphql-go"
+	"github.com/nathanburkett/nathanb-api/app"
+	"github.com/nathanburkett/nathanb-api/data"
+	"github.com/nathanburkett/nathanb-api/env"
+	"github.com/nathanburkett/nathanb-api/resolver"
+	"github.com/nathanburkett/nathanb-api/schema"
+	"github.com/nathanburkett/nathanb-api/schema_standard"
+	"log"
+	"os"
 )
 
 func main() {
-	dataSource := data.NewSource(env.Must("DB_DSN")).Connect()
 	instance := app.NewInstance()
 
-	instance.SetDataSource(dataSource)
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	standard := schema_standard.Definition{}
-	instance.SetSchema(parseSchema(standard, dataSource.DB()))
+	instance.SetRootDir(pwd)
+	env.ReadEnv(instance)
+
+	dataSource := data.NewSource(env.Must("DB_DSN")).Connect()
+
+	instance.SetDataSource(dataSource)
+	instance.SetSchema(parseSchema(schema_standard.Definition{}, dataSource.DB()))
 }
 
 func getHostAndPort() string {
