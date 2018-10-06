@@ -12,6 +12,7 @@ const FieldProfileFirstName = "first_name"
 const FieldProfileLastName = "last_name"
 const FieldProfileTwitterHandle = "twitter_handle"
 const FieldProfileGithubHandle = "github_handle"
+const FieldProfileUserId = "user_id"
 const FieldProfileCreatedAt = FieldCreatedAt
 const FieldProfileUpdatedAt = FieldUpdatedAt
 const FieldProfileDeletedAt = FieldDeletedAt

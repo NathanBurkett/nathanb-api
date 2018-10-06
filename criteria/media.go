@@ -1,8 +1,10 @@
 package criteria
 
 import (
-	"github.com/nathanburkett/nathanb-api/data_object"
 	"fmt"
+	query "github.com/Masterminds/squirrel"
+	"github.com/nathanburkett/nathanb-api/data_object"
+	"github.com/satori/go.uuid"
 )
 
 const FieldMediaId = FieldId
@@ -17,17 +19,46 @@ const FieldMediaUpdatedAt = FieldUpdatedAt
 const FieldMediaDeletedAt = FieldDeletedAt
 const FieldMediaPublications = "publications"
 
+type FirstMediaArgs struct {
+	ID   *uuid.UUID
+	Path *string
+}
+
 type mediaInterpretation struct{}
 
 func (mi mediaInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
+	if c.Error() != nil {
+		return
+	}
 
+	switch T := args.(type) {
+	case FirstMediaArgs:
+		mi.interpretFirstCategoryArgs(c, T)
+		break
+	case PaginationArgs:
+		T = mi.checkDefaultPaginationArgs(T)
+		interpretPaginationArgs(c, T)
+		break
+	default:
+		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
+	}
+}
+
+func (mi mediaInterpretation) interpretFirstCategoryArgs(criteria AbstractCriteria, args FirstMediaArgs) {
+	if args.ID != nil {
+		criteria.Where(query.Eq{data_object.FieldMediaId: args.ID})
+	}
+
+	if args.Path != nil {
+		criteria.Where(query.Eq{data_object.FieldMediaPath: args.Path})
+	}
 }
 
 func (mi mediaInterpretation) handleField(field string) (string, bool, error) {
 	var (
 		column string
-		err error
-		skip bool
+		err    error
+		skip   bool
 	)
 
 	switch field {
@@ -69,4 +100,15 @@ func (mi mediaInterpretation) handleField(field string) (string, bool, error) {
 	}
 
 	return column, skip, err
+}
+
+func (mi mediaInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
+	args = checkDefaultPaginationArgs(args)
+
+	if args.OrderBy != nil {
+		args.OrderBy = &[]string{
+			fmt.Sprintf("%s %s", data_object.FieldCategoryCreatedAt, DirDesc),
+		}
+	}
+	return args
 }

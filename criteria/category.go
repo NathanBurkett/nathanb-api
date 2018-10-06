@@ -1,9 +1,9 @@
 package criteria
 
 import (
-	"github.com/nathanburkett/nathanb-api/data_object"
-	query "github.com/Masterminds/squirrel"
 	"fmt"
+	query "github.com/Masterminds/squirrel"
+	"github.com/nathanburkett/nathanb-api/data_object"
 	"github.com/satori/go.uuid"
 )
 
@@ -30,75 +30,28 @@ func (ci categoryInterpretation) handleArgs(c AbstractCriteria, args interface{}
 
 	switch T := args.(type) {
 	case FirstCategoryArgs:
-		ci.interpretFirstCategoryArgs(c, args)
+		ci.interpretFirstCategoryArgs(c, T)
 		break
 	case PaginationArgs:
-		ci.interpretAllCategoryArgs(c, args)
+		T = ci.checkDefaultPaginationArgs(T)
+		interpretPaginationArgs(c, T)
 		break
 	default:
 		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
 	}
 }
 
-func (ci categoryInterpretation) interpretFirstCategoryArgs(c AbstractCriteria, args interface{}) {
-	firstArgs := args.(FirstCategoryArgs)
-
-	if firstArgs.ID != nil {
-		c.Where(query.Eq{data_object.FieldCategoryId: firstArgs.ID})
+func (ci categoryInterpretation) interpretFirstCategoryArgs(c AbstractCriteria, args FirstCategoryArgs) {
+	if args.ID != nil {
+		c.Where(query.Eq{data_object.FieldCategoryId: args.ID})
 	}
 
-	if firstArgs.Title != nil {
-		c.Where(query.Eq{data_object.FieldCategoryTitle: firstArgs.Title})
+	if args.Title != nil {
+		c.Where(query.Eq{data_object.FieldCategoryTitle: args.Title})
 	}
 
-	if firstArgs.Slug != nil {
-		c.Where(query.Eq{data_object.FieldCategorySlug: firstArgs.Slug})
-	}
-}
-
-func (ci categoryInterpretation) interpretAllCategoryArgs(c AbstractCriteria, args interface{}) {
-	allArgs := args.(PaginationArgs)
-
-	if allArgs.Limit == nil {
-		l := uint64(10)
-		allArgs.Limit = &l
-	}
-
-	if allArgs.Page == nil {
-		l := uint64(1)
-		allArgs.Page = &l
-	}
-
-	if allArgs.OrderBy != nil {
-		allArgs.OrderBy = &[]string{"slug DESC"}
-	}
-
-	c.Limit(*allArgs.Limit)
-	c.Offset(*allArgs.Limit * *allArgs.Page)
-	c.OrderBy(*allArgs.OrderBy)
-
-	if allArgs.Where != nil {
-		for key, clauses := range *allArgs.Where {
-			if c.Error() != nil {
-				return
-			}
-
-			column, shouldSkip, err := ci.handleField(key)
-			if err != nil {
-				c.SetError(err)
-				return
-			}
-
-			if shouldSkip {
-				continue
-			}
-
-			newClauses := interpretWhereClauses(column, clauses)
-			for i := 0; i < len(newClauses); i++ {
-				c.Where(newClauses[i])
-			}
-
-		}
+	if args.Slug != nil {
+		c.Where(query.Eq{data_object.FieldCategorySlug: args.Slug})
 	}
 }
 
@@ -129,4 +82,16 @@ func (ci categoryInterpretation) handleField(field string) (string, bool, error)
 	}
 
 	return column, skip, err
+}
+
+func (ci categoryInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
+	args = checkDefaultPaginationArgs(args)
+
+	if args.OrderBy != nil {
+		args.OrderBy = &[]string{
+			fmt.Sprintf("%s %s", data_object.FieldCategorySlug, DirDesc),
+		}
+	}
+
+	return args
 }

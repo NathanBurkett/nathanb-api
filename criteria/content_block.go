@@ -1,9 +1,9 @@
 package criteria
 
 import (
-	"github.com/nathanburkett/nathanb-api/data_object"
-	query "github.com/Masterminds/squirrel"
 	"fmt"
+	query "github.com/Masterminds/squirrel"
+	"github.com/nathanburkett/nathanb-api/data_object"
 	"github.com/satori/go.uuid"
 )
 
@@ -17,7 +17,7 @@ const FieldContentBlockUpdatedAt = FieldUpdatedAt
 const FieldContentBlockDeletedAt = FieldDeletedAt
 
 type FirstContentBlockArgs struct {
-	ID *uuid.UUID
+	ID   *uuid.UUID
 	Type *string
 }
 
@@ -33,7 +33,8 @@ func (cbi contentBlockInterpretation) handleArgs(c AbstractCriteria, args interf
 		cbi.interpretFirstContentBlockArgs(c, args)
 		break
 	case PaginationArgs:
-		cbi.interpretAllContentBlockArgs(c, args)
+		T = cbi.checkDefaultPaginationArgs(T)
+		interpretPaginationArgs(c, T)
 		break
 	default:
 		c.SetError(fmt.Errorf("unknown content block argument type: %s", T))
@@ -53,15 +54,11 @@ func (cbi contentBlockInterpretation) interpretFirstContentBlockArgs(c AbstractC
 	}
 }
 
-func (cbi contentBlockInterpretation) interpretAllContentBlockArgs(c AbstractCriteria, args interface{}) {
-
-}
-
 func (cbi contentBlockInterpretation) handleField(field string) (string, bool, error) {
 	var (
 		column string
-		err error
-		skip bool
+		err    error
+		skip   bool
 	)
 
 	switch field {
@@ -91,4 +88,10 @@ func (cbi contentBlockInterpretation) handleField(field string) (string, bool, e
 	}
 
 	return column, skip, err
+}
+
+func (cbi contentBlockInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
+	args = checkDefaultPaginationArgs(args)
+
+	return args
 }

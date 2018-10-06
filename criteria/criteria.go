@@ -13,13 +13,6 @@ type Criteria struct {
 	err         error
 }
 
-type PaginationArgs struct {
-	Limit *uint64
-	Page  *uint64
-	OrderBy *[]string
-	Where *map[string][]WhereClause
-}
-
 func New(model data_object.Model, args interface{}, fields []selected.SelectedField) AbstractCriteria {
 	cri := &Criteria{
 		builder: query.SelectBuilder{}.PlaceholderFormat(query.Question),
@@ -131,4 +124,8 @@ func (c *Criteria) Error() error {
 
 func (c *Criteria) SetError(err error) {
 	c.err = err
+}
+
+func (c *Criteria) Interpreter() ModelInterpreter {
+	return c.interpreter
 }

@@ -43,3 +43,7 @@ func (cri *Criteria) Error() error {
 func (cri *Criteria) SetError(error) {
 	panic("implement me")
 }
+
+func (cri *Criteria) Interpreter() criteria.ModelInterpreter {
+	panic("implement me")
+}

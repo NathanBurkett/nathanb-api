@@ -16,6 +16,9 @@ const QualifierGT = ">"
 const QualifierGTE = ">="
 const QualifierNotEq = "!="
 
+const DirDesc = "DESC"
+const DirAsc = "ASC"
+
 type WhereClause struct {
 	qualifier *string
 	value *interface{}
@@ -56,6 +59,59 @@ func interpretWhereClauses(key string, clauses []WhereClause) []interface{} {
 	return retClauses
 }
 
+type PaginationArgs struct {
+	Limit *uint64
+	Page  *uint64
+	OrderBy *[]string
+	Where *map[string][]WhereClause
+}
+
+func interpretPaginationArgs(c AbstractCriteria, args PaginationArgs) {
+	c.Limit(*args.Limit)
+	c.Offset(*args.Limit * *args.Page)
+	c.OrderBy(*args.OrderBy)
+
+	if args.Where == nil {
+		return
+	}
+
+	for key, clauses := range *args.Where {
+		if c.Error() != nil {
+			return
+		}
+
+		column, shouldSkip, err := c.Interpreter().handleField(key)
+		if err != nil {
+			c.SetError(err)
+			return
+		}
+
+		if shouldSkip {
+			continue
+		}
+
+		// TODO nested loop. Refactor this
+		newClauses := interpretWhereClauses(column, clauses)
+		for i := 0; i < len(newClauses); i++ {
+			c.Where(newClauses[i])
+		}
+	}
+}
+
+func checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
+	if args.Limit == nil {
+		l := uint64(10)
+		args.Limit = &l
+	}
+
+	if args.Page == nil {
+		l := uint64(1)
+		args.Page = &l
+	}
+
+	return args
+}
+
 type AbstractCriteria interface {
 	From(table string) AbstractCriteria
 	Where(pred interface{}, args ...interface{}) AbstractCriteria
@@ -66,4 +122,5 @@ type AbstractCriteria interface {
 	ToSql() (string, []interface{}, error)
 	Error() error
 	SetError(error)
+	Interpreter() ModelInterpreter
 }

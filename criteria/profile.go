@@ -1,8 +1,10 @@
 package criteria
 
 import (
-	"github.com/nathanburkett/nathanb-api/data_object"
 	"fmt"
+	query "github.com/Masterminds/squirrel"
+	"github.com/nathanburkett/nathanb-api/data_object"
+	"github.com/satori/go.uuid"
 )
 
 const FieldProfileId = FieldId
@@ -14,17 +16,56 @@ const FieldProfileCreatedAt = FieldCreatedAt
 const FieldProfileUpdatedAt = FieldUpdatedAt
 const FieldProfileDeletedAt = FieldDeletedAt
 
-type profileInterpretation struct {}
+type FirstProfileArgs struct {
+	ID            *uuid.UUID
+	UserID        *string
+	GithubHandle  *string
+	TwitterHandle *string
+}
+
+type profileInterpretation struct{}
 
 func (pi profileInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
+	if c.Error() != nil {
+		return
+	}
 
+	switch T := args.(type) {
+	case FirstProfileArgs:
+		pi.interpretFirstCategoryArgs(c, T)
+		break
+	case PaginationArgs:
+		T = pi.checkDefaultPaginationArgs(T)
+		interpretPaginationArgs(c, T)
+		break
+	default:
+		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
+	}
+}
+
+func (pi profileInterpretation) interpretFirstCategoryArgs(criteria AbstractCriteria, args FirstProfileArgs) {
+	if args.ID != nil {
+		criteria.Where(query.Eq{data_object.FieldProfileId: args.ID})
+	}
+
+	if args.UserID != nil {
+		criteria.Where(query.Eq{data_object.FieldProfileUserId: args.UserID})
+	}
+
+	if args.GithubHandle != nil {
+		criteria.Where(query.Eq{data_object.FieldProfileGithubHandle: args.GithubHandle})
+	}
+
+	if args.TwitterHandle != nil {
+		criteria.Where(query.Eq{data_object.FieldProfileTwitterHandle: args.TwitterHandle})
+	}
 }
 
 func (pi profileInterpretation) handleField(field string) (string, bool, error) {
 	var (
 		column string
-		err error
-		skip bool
+		err    error
+		skip   bool
 	)
 
 	switch field {
@@ -57,4 +98,17 @@ func (pi profileInterpretation) handleField(field string) (string, bool, error) 
 	}
 
 	return column, skip, err
+}
+
+func (pi profileInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
+	args = checkDefaultPaginationArgs(args)
+
+	if args.OrderBy != nil {
+		args.OrderBy = &[]string{
+			fmt.Sprintf("%s %s", data_object.FieldProfileLastName, DirDesc),
+			fmt.Sprintf("%s %s", data_object.FieldProfileFirstName, DirDesc),
+		}
+	}
+
+	return args
 }

@@ -8,6 +8,7 @@ import (
 type ModelInterpreter interface {
 	handleArgs(AbstractCriteria, interface{})
 	handleField(string) (string, bool, error)
+	checkDefaultPaginationArgs(PaginationArgs) PaginationArgs
 }
 
 type ModelInterpreterFactory struct {}

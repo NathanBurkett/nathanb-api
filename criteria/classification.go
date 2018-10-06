@@ -1,9 +1,10 @@
 package criteria
 
 import (
-	"github.com/satori/go.uuid"
 	"fmt"
+	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/nathanb-api/data_object"
+	"github.com/satori/go.uuid"
 )
 
 const FieldClassificationId = FieldId
@@ -29,11 +30,28 @@ func (cl classificationInterpretation) handleArgs(c AbstractCriteria, args inter
 
 	switch T := args.(type) {
 	case FirstClassificationArgs:
+		cl.interpretFirstClassificationArgs(c, T)
 		break
 	case PaginationArgs:
+		T = cl.checkDefaultPaginationArgs(T)
+		interpretPaginationArgs(c, T)
 		break
 	default:
 		c.SetError(fmt.Errorf("unknown classification argument type: %s", T))
+	}
+}
+
+func (cl classificationInterpretation) interpretFirstClassificationArgs(c AbstractCriteria, args FirstClassificationArgs) {
+	if args.ID != nil {
+		c.Where(query.Eq{data_object.FieldCategoryId: args.ID})
+	}
+
+	if args.Title != nil {
+		c.Where(query.Eq{data_object.FieldCategoryTitle: args.Title})
+	}
+
+	if args.Slug != nil {
+		c.Where(query.Eq{data_object.FieldCategorySlug: args.Slug})
 	}
 }
 
@@ -72,4 +90,16 @@ func (cl classificationInterpretation) handleField(field string) (string, bool, 
 	}
 
 	return column, shouldSkip, err
+}
+
+func (cl classificationInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
+	args = checkDefaultPaginationArgs(args)
+
+	if args.OrderBy != nil {
+		args.OrderBy = &[]string{
+			fmt.Sprintf("%s %s", data_object.FieldClassificationSlug, DirDesc),
+		}
+	}
+
+	return args
 }
