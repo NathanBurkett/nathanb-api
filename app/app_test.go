@@ -1,10 +1,11 @@
 package app_test
 
 import (
-	"github.com/nathanburkett/nathanb-api/app"
+	"reflect"
 	"testing"
 
 	"github.com/nathanburkett/graphql-go"
+	"github.com/nathanburkett/nathanb-api/app"
 	"github.com/nathanburkett/nathanb-api/data"
 	"github.com/stretchr/testify/assert"
 )
@@ -45,7 +46,7 @@ func TestInstance_SetDataSource(t *testing.T) {
 		want   *app.Instance
 	}{
 		{
-			name: "Provides *data.Source",
+			name:   "Provides *data.Source",
 			fields: fields{},
 			args: args{
 				ds: &data.Source{},
@@ -78,7 +79,7 @@ func TestInstance_SetSchema(t *testing.T) {
 		want   *app.Instance
 	}{
 		{
-			name: "Provides *data.Source",
+			name:   "Provides *data.Source",
 			fields: fields{},
 			args: args{
 				schema: &graphql.Schema{},
@@ -92,6 +93,69 @@ func TestInstance_SetSchema(t *testing.T) {
 			i.SetSchema(tt.args.schema)
 
 			assert.NotNil(t, i.Schema(), "Instance.SetSchema() correctly sets Instance.schema")
+		})
+	}
+}
+
+func TestInstance_SetRootDir(t *testing.T) {
+	type fields struct {
+		dataSource *data.Source
+		schema     *graphql.Schema
+		rootDir    string
+	}
+	type args struct {
+		root string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *app.Instance
+	}{
+		{
+			name: "Sets RootDir",
+			fields: fields{},
+			args: args{
+				root: "./../",
+			},
+			want: (&app.Instance{}).SetRootDir("./../"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := &app.Instance{}
+			if got := i.SetRootDir(tt.args.root); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Instance.SetRootDir() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInstance_RootDir(t *testing.T) {
+	type fields struct {
+		dataSource *data.Source
+		schema     *graphql.Schema
+		rootDir    string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "Gets RootDir",
+			fields: fields{
+				rootDir: "./../",
+			},
+			want: "./../",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := (&app.Instance{}).SetRootDir(tt.fields.rootDir)
+			if got := i.RootDir(); got != tt.want {
+				t.Errorf("Instance.RootDir() = %v, want %v", got, tt.want)
+			}
 		})
 	}
 }

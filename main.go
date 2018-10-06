@@ -16,15 +16,13 @@ import (
 )
 
 func main() {
-	instance := app.NewInstance()
-
 	pwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	instance.SetRootDir(pwd)
-	env.ReadEnv(instance)
+	instance := app.NewInstance().SetRootDir(pwd)
+	readEnv(instance)
 
 	dataSource := data.NewSource(env.Must("DB_DSN")).Connect()
 
@@ -43,4 +41,17 @@ func parseSchema(def schema.Definition, db *sqlx.DB) *graphql.Schema {
 	}
 
 	return s
+}
+
+func readEnv(instance *app.Instance) {
+	envPath := fmt.Sprintf("%s/.env", instance.RootDir())
+
+	file, err := os.Open(envPath)
+	defer file.Close()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	envReader := env.NewReader(file)
+	envReader.Read()
 }

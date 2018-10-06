@@ -3,7 +3,7 @@ package env
 import (
 	"bufio"
 	"fmt"
-	"github.com/nathanburkett/nathanb-api/app"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -11,6 +11,12 @@ import (
 
 const SliceKey = "key"
 const SliceValue = "value"
+
+type Reader struct {
+	reader io.Reader
+}
+
+type envVars []map[string]string
 
 // Must Get the env key's value. Log error and exit if doesn't exist
 func Must(key string) string {
@@ -22,50 +28,52 @@ func Must(key string) string {
 	return value
 }
 
-func ReadEnv(app *app.Instance) {
-	envVars := readEnvFromFile(app.RootDir())
-	setEnvFromSlice(envVars)
+func NewReader(ioReader io.Reader) Reader {
+	return Reader{
+		reader: ioReader,
+	}
 }
 
-func readEnvFromFile(dir string) []map[string]string {
-	var envVars []map[string]string
+// Read Read and set ENV by io.Reader
+func (r Reader) Read() {
+	values := r.readEnvFromIo()
+	r.setEnvFromSlice(values)
+}
 
-	file, err := os.Open(fmt.Sprintf("%s/.env", dir))
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+func (r Reader) readEnvFromIo() []map[string]string {
+	var vars envVars
 
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(r.reader)
 
 	for scanner.Scan() {
-		row := strings.SplitN(scanner.Text(), "=", 2)
-		count := len(row)
-
-		if count > 2 || count < 2 {
-			log.Fatalf("Could not read ENV")
-		}
-
-		if _, exists := os.LookupEnv(row[0]); exists {
-			continue
-		}
-
-		envVars = append(envVars, map[string]string{
-			SliceKey:   row[0],
-			SliceValue: row[1],
-		})
+		vars = r.readEnvRow(scanner, vars)
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
-	return envVars
+	return vars
 }
 
-func setEnvFromSlice(envRowSlice []map[string]string) {
-	for i := 0; i < len(envRowSlice); i++ {
-		row := envRowSlice[i]
-		os.Setenv(row[SliceKey], row[SliceKey])
+func (r Reader) readEnvRow(scanner *bufio.Scanner, env envVars) envVars {
+	row := strings.SplitN(scanner.Text(), "=", 2)
+
+	if _, exists := os.LookupEnv(row[0]); exists {
+		return env
+	}
+
+	env = append(env, map[string]string{
+		SliceKey:   row[0],
+		SliceValue: row[1],
+	})
+
+	return env
+}
+
+func (r Reader) setEnvFromSlice(envSlice []map[string]string) {
+	for i := 0; i < len(envSlice); i++ {
+		row := envSlice[i]
+		os.Setenv(row[SliceKey], row[SliceValue])
 	}
 }
