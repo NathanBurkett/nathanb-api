@@ -1,6 +1,7 @@
 package data_object_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -49,4 +50,19 @@ func TestProfile_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestProfile_Fields(t *testing.T) {
+	c := data_object.Profile{}
+	assert.Equal(t, []string{
+		data_object.FieldProfileId,
+		data_object.FieldProfileFirstName,
+		data_object.FieldProfileLastName,
+		data_object.FieldProfileTwitterHandle,
+		data_object.FieldProfileGithubHandle,
+		data_object.FieldProfileUserId,
+		data_object.FieldProfileCreatedAt,
+		data_object.FieldProfileUpdatedAt,
+		data_object.FieldProfileDeletedAt,
+	}, c.Fields())
 }

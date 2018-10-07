@@ -1,6 +1,7 @@
 package data_object_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -53,4 +54,20 @@ func TestMedia_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMedia_Fields(t *testing.T) {
+	c := data_object.Media{}
+	assert.Equal(t, []string{
+		data_object.FieldMediaId,
+		data_object.FieldMediaType,
+		data_object.FieldMediaSubtype,
+		data_object.FieldMediaTitle,
+		data_object.FieldMediaPath,
+		data_object.FieldMediaAlt,
+		data_object.FieldMediaAspectRatio,
+		data_object.FieldMediaCreatedAt,
+		data_object.FieldMediaUpdatedAt,
+		data_object.FieldMediaDeletedAt,
+	}, c.Fields())
 }

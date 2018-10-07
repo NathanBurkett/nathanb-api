@@ -2,6 +2,7 @@ package data_object_test
 
 import (
 	"github.com/nathanburkett/nathanb-api/data_object"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/satori/go.uuid"
@@ -34,4 +35,13 @@ func TestMediaPublication_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMediaPublication_Fields(t *testing.T) {
+	c := data_object.MediaPublication{}
+	assert.Equal(t, []string{
+		data_object.FieldMediaPublicationId,
+		data_object.FieldMediaPublicationMediaId,
+		data_object.FieldMediaPublicationPublicationId,
+	}, c.Fields())
 }

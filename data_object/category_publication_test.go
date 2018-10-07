@@ -2,6 +2,7 @@ package data_object_test
 
 import (
 	"github.com/nathanburkett/nathanb-api/data_object"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/satori/go.uuid"
@@ -34,4 +35,13 @@ func TestCategoryPublication_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCategoryPublication_Fields(t *testing.T) {
+	c := data_object.CategoryPublication{}
+	assert.Equal(t, []string{
+		data_object.FieldCategoryPublicationId,
+		data_object.FieldCategoryPublicationCategoryId,
+		data_object.FieldCategoryPublicationPublicationId,
+	}, c.Fields())
 }

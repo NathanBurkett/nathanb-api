@@ -1,6 +1,7 @@
 package data_object_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -49,4 +50,17 @@ func TestContentBlock_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestContentBlock_Fields(t *testing.T) {
+	c := data_object.ContentBlock{}
+	assert.Equal(t, []string{
+		data_object.FieldContentBlockId,
+		data_object.FieldContentBlockType,
+		data_object.FieldContentBlockContent,
+		data_object.FieldContentBlockOrder,
+		data_object.FieldContentBlockCreatedAt,
+		data_object.FieldContentBlockUpdatedAt,
+		data_object.FieldContentBlockDeletedAt,
+	}, c.Fields())
 }

@@ -2,6 +2,7 @@ package data_object_test
 
 import (
 	"github.com/nathanburkett/nathanb-api/data_object"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/satori/go.uuid"
@@ -34,4 +35,13 @@ func TestPublicationUser_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPublicationUser_Fields(t *testing.T) {
+	c := data_object.PublicationUser{}
+	assert.Equal(t, []string{
+		data_object.FieldPublicationUserId,
+		data_object.FieldPublicationUserPublicationId,
+		data_object.FieldPublicationUserUserId,
+	}, c.Fields())
 }

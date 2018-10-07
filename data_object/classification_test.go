@@ -1,6 +1,7 @@
 package data_object_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -45,4 +46,16 @@ func TestClassification_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestClassification_Fields(t *testing.T) {
+	c := data_object.Classification{}
+	assert.Equal(t, []string{
+		data_object.FieldClassificationId,
+		data_object.FieldClassificationTitle,
+		data_object.FieldClassificationSlug,
+		data_object.FieldClassificationCreatedAt,
+		data_object.FieldClassificationUpdatedAt,
+		data_object.FieldClassificationDeletedAt,
+	}, c.Fields())
 }

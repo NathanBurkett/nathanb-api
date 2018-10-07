@@ -1,6 +1,7 @@
 package data_object_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -24,9 +25,9 @@ func TestCategory_Table(t *testing.T) {
 		want   string
 	}{
 		{
-			name: "Passes",
+			name:   "Passes",
 			fields: fields{},
-			want: data_object.TableCategory,
+			want:   data_object.TableCategory,
 		},
 	}
 	for _, tt := range tests {
@@ -45,4 +46,16 @@ func TestCategory_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCategory_Fields(t *testing.T) {
+	c := data_object.Category{}
+	assert.Equal(t, []string{
+		data_object.FieldCategoryId,
+		data_object.FieldCategoryTitle,
+		data_object.FieldCategorySlug,
+		data_object.FieldCategoryCreatedAt,
+		data_object.FieldCategoryUpdatedAt,
+		data_object.FieldCategoryDeletedAt,
+	}, c.Fields())
 }

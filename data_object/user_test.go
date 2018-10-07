@@ -1,6 +1,7 @@
 package data_object_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -47,4 +48,16 @@ func TestUser_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestUser_Fields(t *testing.T) {
+	c := data_object.User{}
+	assert.Equal(t, []string{
+		data_object.FieldUserId,
+		data_object.FieldUserEmail,
+		data_object.FieldUserPasswordDigest,
+		data_object.FieldUserCreatedAt,
+		data_object.FieldUserUpdatedAt,
+		data_object.FieldUserDeletedAt,
+	}, c.Fields())
 }

@@ -1,6 +1,7 @@
 package data_object_test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -57,4 +58,17 @@ func TestPublication_Table(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPublication_Fields(t *testing.T) {
+	c := data_object.Publication{}
+	assert.Equal(t, []string{
+		data_object.FieldPublicationId,
+		data_object.FieldPublicationTitle,
+		data_object.FieldPublicationSlug,
+		data_object.FieldPublicationPublishedAt,
+		data_object.FieldPublicationCreatedAt,
+		data_object.FieldPublicationUpdatedAt,
+		data_object.FieldPublicationDeletedAt,
+	}, c.Fields())
 }
