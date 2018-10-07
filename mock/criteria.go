@@ -5,31 +5,32 @@ import (
 )
 
 type Criteria struct {
+	err      error
 	ToSqlErr error
 }
 
 func (cri *Criteria) From(table string) criteria.AbstractCriteria {
-	panic("implement me")
+	return cri
 }
 
 func (cri *Criteria) Where(pred interface{}, args ...interface{}) criteria.AbstractCriteria {
-	panic("implement me")
+	return cri
 }
 
 func (cri *Criteria) OrderBy(clauses []string) criteria.AbstractCriteria {
-	panic("implement me")
+	return cri
 }
 
 func (cri *Criteria) Limit(limit uint64) criteria.AbstractCriteria {
-	panic("implement me")
+	return cri
 }
 
 func (cri *Criteria) Offset(limit uint64) criteria.AbstractCriteria {
-	panic("implement me")
+	return cri
 }
 
 func (cri *Criteria) Fields(fields ...string) criteria.AbstractCriteria {
-	panic("implement me")
+	return cri
 }
 
 func (cri *Criteria) ToSql() (string, []interface{}, error) {
@@ -37,7 +38,7 @@ func (cri *Criteria) ToSql() (string, []interface{}, error) {
 }
 
 func (cri *Criteria) Error() error {
-	panic("implement me")
+	return cri.err
 }
 
 func (cri *Criteria) SetError(error) {

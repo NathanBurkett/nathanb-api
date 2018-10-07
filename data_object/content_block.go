@@ -1,13 +1,13 @@
 package data_object
 
 import (
-	"time"
 	"github.com/satori/go.uuid"
+	"time"
 )
 
 const TableContentBlock = "content_block"
 
-const FieldContentBlockID = FieldId
+const FieldContentBlockId = FieldId
 const FieldContentBlockType = "type"
 const FieldContentBlockContent = "content"
 const FieldContentBlockOrder = "order"
@@ -29,4 +29,16 @@ type ContentBlock struct {
 
 func (cb ContentBlock) Table() string {
 	return TableContentBlock
+}
+
+func (cb ContentBlock) Fields() []string {
+	return []string{
+		FieldContentBlockId,
+		FieldContentBlockType,
+		FieldContentBlockContent,
+		FieldContentBlockOrder,
+		FieldContentBlockCreatedAt,
+		FieldContentBlockUpdatedAt,
+		FieldContentBlockDeletedAt,
+	}
 }

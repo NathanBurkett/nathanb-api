@@ -5,6 +5,7 @@ import (
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/nathanb-api/data_object"
 	"github.com/satori/go.uuid"
+	"reflect"
 )
 
 const FieldMediaId = FieldId
@@ -19,20 +20,31 @@ const FieldMediaUpdatedAt = FieldUpdatedAt
 const FieldMediaDeletedAt = FieldDeletedAt
 const FieldMediaPublications = "publications"
 
-type FirstMediaArgs struct {
+type SingleMediaArgs struct {
 	ID   *uuid.UUID
 	Path *string
 }
 
 type mediaInterpretation struct{}
 
-func (mi mediaInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
-	if c.Error() != nil {
-		return
+func (mediaInterpretation) fields() map[string]string {
+	return map[string]string{
+		FieldMediaId:          data_object.FieldMediaId,
+		FieldMediaType:        data_object.FieldMediaType,
+		FieldMediaSubtype:     data_object.FieldMediaSubtype,
+		FieldMediaTitle:       data_object.FieldMediaTitle,
+		FieldMediaPath:        data_object.FieldMediaPath,
+		FieldMediaAlt:         data_object.FieldMediaAlt,
+		FieldMediaAspectRatio: data_object.FieldMediaAspectRatio,
+		FieldMediaCreatedAt:   data_object.FieldMediaCreatedAt,
+		FieldMediaUpdatedAt:   data_object.FieldMediaUpdatedAt,
+		FieldMediaDeletedAt:   data_object.FieldMediaDeletedAt,
 	}
+}
 
+func (mi mediaInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 	switch T := args.(type) {
-	case FirstMediaArgs:
+	case SingleMediaArgs:
 		mi.interpretFirstCategoryArgs(c, T)
 		break
 	case PaginationArgs:
@@ -40,11 +52,11 @@ func (mi mediaInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 		interpretPaginationArgs(c, T)
 		break
 	default:
-		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
+		c.SetError(fmt.Errorf("unknown media argument type: %s", reflect.TypeOf(T)))
 	}
 }
 
-func (mi mediaInterpretation) interpretFirstCategoryArgs(criteria AbstractCriteria, args FirstMediaArgs) {
+func (mi mediaInterpretation) interpretFirstCategoryArgs(criteria AbstractCriteria, args SingleMediaArgs) {
 	if args.ID != nil {
 		criteria.Where(query.Eq{data_object.FieldMediaId: args.ID})
 	}
@@ -61,42 +73,9 @@ func (mi mediaInterpretation) handleField(field string) (string, bool, error) {
 		skip   bool
 	)
 
-	switch field {
-	case FieldMediaId:
-		column = data_object.FieldMediaId
-		break
-	case FieldMediaType:
-		column = data_object.FieldMediaType
-		break
-	case FieldMediaSubtype:
-		column = data_object.FieldMediaSubtype
-		break
-	case FieldMediaTitle:
-		column = data_object.FieldMediaTitle
-		break
-	case FieldMediaPath:
-		column = data_object.FieldMediaPath
-		break
-	case FieldMediaAlt:
-		column = data_object.FieldMediaAlt
-		break
-	case FieldMediaAspectRatio:
-		column = data_object.FieldMediaAspectRatio
-		break
-	case FieldMediaCreatedAt:
-		column = data_object.FieldMediaCreatedAt
-		break
-	case FieldMediaUpdatedAt:
-		column = data_object.FieldMediaUpdatedAt
-		break
-	case FieldMediaDeletedAt:
-		column = data_object.FieldMediaDeletedAt
-		break
-	case FieldMediaPublications:
-		skip = true
-		break
-	default:
-		err = fmt.Errorf("unknown media field: %s", field)
+	column = mi.fields()[field]
+	if column == "" {
+		err = fmt.Errorf("unknown field: %s", field)
 	}
 
 	return column, skip, err
@@ -105,10 +84,9 @@ func (mi mediaInterpretation) handleField(field string) (string, bool, error) {
 func (mi mediaInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
 	args = checkDefaultPaginationArgs(args)
 
-	if args.OrderBy != nil {
-		args.OrderBy = &[]string{
-			fmt.Sprintf("%s %s", data_object.FieldCategoryCreatedAt, DirDesc),
-		}
+	if args.OrderBy == nil {
+		args.OrderBy = &[]string{}
 	}
+
 	return args
 }

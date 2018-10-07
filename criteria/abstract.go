@@ -19,6 +19,9 @@ const QualifierNotEq = "!="
 const DirDesc = "DESC"
 const DirAsc = "ASC"
 
+const DefaultLimit = 10
+const DefaultPage = 1
+
 type WhereClause struct {
 	qualifier *string
 	value *interface{}
@@ -68,8 +71,14 @@ type PaginationArgs struct {
 
 func interpretPaginationArgs(c AbstractCriteria, args PaginationArgs) {
 	c.Limit(*args.Limit)
-	c.Offset(*args.Limit * *args.Page)
-	c.OrderBy(*args.OrderBy)
+	if *args.Page > 1 {
+		offset := (*args.Limit * *args.Page) - *args.Limit
+		c.Offset(offset)
+	}
+
+	if *args.OrderBy != nil && len(*args.OrderBy) > 0 {
+		c.OrderBy(*args.OrderBy)
+	}
 
 	if args.Where == nil {
 		return
@@ -100,12 +109,12 @@ func interpretPaginationArgs(c AbstractCriteria, args PaginationArgs) {
 
 func checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
 	if args.Limit == nil {
-		l := uint64(10)
+		l := uint64(DefaultLimit)
 		args.Limit = &l
 	}
 
 	if args.Page == nil {
-		l := uint64(1)
+		l := uint64(DefaultPage)
 		args.Page = &l
 	}
 

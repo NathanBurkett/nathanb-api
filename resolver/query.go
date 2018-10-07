@@ -20,7 +20,7 @@ func NewQuery(db *sqlx.DB) *Query {
 	}
 }
 
-func (q *Query) Category(ctx context.Context, args criteria.FirstCategoryArgs, fields []selected.SelectedField) (*category, error) {
+func (q *Query) Category(ctx context.Context, args criteria.SingleCategoryArgs, fields []selected.SelectedField) (*category, error) {
 	var cat data_object.Category
 
 	cri := criteria.New(cat, args, fields)

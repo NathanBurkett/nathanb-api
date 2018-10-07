@@ -5,9 +5,10 @@ import (
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/nathanb-api/data_object"
 	"github.com/satori/go.uuid"
+	"reflect"
 )
 
-const FieldContentBlockID = FieldId
+const FieldContentBlockId = FieldId
 const FieldContentBlockType = "type"
 const FieldContentBlockContent = "content"
 const FieldContentBlockOrder = "order"
@@ -16,20 +17,28 @@ const FieldContentBlockCreatedAt = FieldCreatedAt
 const FieldContentBlockUpdatedAt = FieldUpdatedAt
 const FieldContentBlockDeletedAt = FieldDeletedAt
 
-type FirstContentBlockArgs struct {
+type SingleContentBlockArgs struct {
 	ID   *uuid.UUID
 	Type *string
 }
 
 type contentBlockInterpretation struct{}
 
-func (cbi contentBlockInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
-	if c.Error() != nil {
-		return
+func (cbi contentBlockInterpretation) fields() map[string]string {
+	return map[string]string{
+		FieldContentBlockId:        data_object.FieldContentBlockId,
+		FieldContentBlockType:      data_object.FieldContentBlockType,
+		FieldContentBlockContent:   data_object.FieldContentBlockContent,
+		FieldContentBlockOrder:     data_object.FieldContentBlockOrder,
+		FieldContentBlockCreatedAt: data_object.FieldContentBlockCreatedAt,
+		FieldContentBlockUpdatedAt: data_object.FieldContentBlockUpdatedAt,
+		FieldContentBlockDeletedAt: data_object.FieldContentBlockDeletedAt,
 	}
+}
 
+func (cbi contentBlockInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 	switch T := args.(type) {
-	case FirstContentBlockArgs:
+	case SingleContentBlockArgs:
 		cbi.interpretFirstContentBlockArgs(c, args)
 		break
 	case PaginationArgs:
@@ -37,16 +46,16 @@ func (cbi contentBlockInterpretation) handleArgs(c AbstractCriteria, args interf
 		interpretPaginationArgs(c, T)
 		break
 	default:
-		c.SetError(fmt.Errorf("unknown content block argument type: %s", T))
+		c.SetError(fmt.Errorf("unknown content block argument type: %s", reflect.TypeOf(T)))
 	}
 
 }
 
 func (cbi contentBlockInterpretation) interpretFirstContentBlockArgs(c AbstractCriteria, args interface{}) {
-	firstArgs := args.(FirstContentBlockArgs)
+	firstArgs := args.(SingleContentBlockArgs)
 
 	if firstArgs.ID != nil {
-		c.Where(query.Eq{data_object.FieldContentBlockID: firstArgs.ID})
+		c.Where(query.Eq{data_object.FieldContentBlockId: firstArgs.ID})
 	}
 
 	if firstArgs.Type != nil {
@@ -61,29 +70,8 @@ func (cbi contentBlockInterpretation) handleField(field string) (string, bool, e
 		skip   bool
 	)
 
-	switch field {
-	case FieldContentBlockID:
-		column = data_object.FieldContentBlockID
-		break
-	case FieldContentBlockType:
-		column = data_object.FieldContentBlockType
-		break
-	case FieldContentBlockContent:
-		column = data_object.FieldContentBlockContent
-		break
-	case FieldContentBlockOrder:
-		column = data_object.FieldContentBlockOrder
-		break
-	case FieldContentBlockCreatedAt:
-		column = data_object.FieldContentBlockCreatedAt
-		break
-	case FieldContentBlockUpdatedAt:
-		column = data_object.FieldContentBlockUpdatedAt
-		break
-	case FieldContentBlockDeletedAt:
-		column = data_object.FieldContentBlockDeletedAt
-		break
-	default:
+	column = cbi.fields()[field]
+	if column == "" {
 		err = fmt.Errorf("unknown content block field: %s", field)
 	}
 
@@ -92,6 +80,12 @@ func (cbi contentBlockInterpretation) handleField(field string) (string, bool, e
 
 func (cbi contentBlockInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
 	args = checkDefaultPaginationArgs(args)
+
+	if args.OrderBy == nil {
+		args.OrderBy = &[]string{
+			fmt.Sprintf("%s %s", fmt.Sprintf("`%s`", data_object.FieldContentBlockOrder), DirDesc),
+		}
+	}
 
 	return args
 }

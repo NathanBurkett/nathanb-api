@@ -5,6 +5,7 @@ import (
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/nathanb-api/data_object"
 	"github.com/satori/go.uuid"
+	"reflect"
 )
 
 const FieldCategoryId = FieldId
@@ -15,21 +16,28 @@ const FieldCategoryCreatedAt = FieldCreatedAt
 const FieldCategoryUpdatedAt = FieldUpdatedAt
 const FieldCategoryDeletedAt = FieldDeletedAt
 
-type FirstCategoryArgs struct {
+type SingleCategoryArgs struct {
 	ID    *uuid.UUID
 	Title *string
 	Slug  *string
 }
 
-type categoryInterpretation struct {}
+type categoryInterpretation struct{}
+
+func (ci categoryInterpretation) fields() map[string]string {
+	return map[string]string{
+		FieldCategoryId:        data_object.FieldCategoryId,
+		FieldCategoryTitle:     data_object.FieldCategoryTitle,
+		FieldCategorySlug:      data_object.FieldCategorySlug,
+		FieldCategoryCreatedAt: data_object.FieldCategoryCreatedAt,
+		FieldCategoryUpdatedAt: data_object.FieldCategoryUpdatedAt,
+		FieldCategoryDeletedAt: data_object.FieldCategoryDeletedAt,
+	}
+}
 
 func (ci categoryInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
-	if c.Error() != nil {
-		return
-	}
-
 	switch T := args.(type) {
-	case FirstCategoryArgs:
+	case SingleCategoryArgs:
 		ci.interpretFirstCategoryArgs(c, T)
 		break
 	case PaginationArgs:
@@ -37,11 +45,11 @@ func (ci categoryInterpretation) handleArgs(c AbstractCriteria, args interface{}
 		interpretPaginationArgs(c, T)
 		break
 	default:
-		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
+		c.SetError(fmt.Errorf("unknown category argument type: %s", reflect.TypeOf(T)))
 	}
 }
 
-func (ci categoryInterpretation) interpretFirstCategoryArgs(c AbstractCriteria, args FirstCategoryArgs) {
+func (ci categoryInterpretation) interpretFirstCategoryArgs(c AbstractCriteria, args SingleCategoryArgs) {
 	if args.ID != nil {
 		c.Where(query.Eq{data_object.FieldCategoryId: args.ID})
 	}
@@ -58,27 +66,13 @@ func (ci categoryInterpretation) interpretFirstCategoryArgs(c AbstractCriteria, 
 func (ci categoryInterpretation) handleField(field string) (string, bool, error) {
 	var (
 		column string
-		err error
-		skip bool
+		err    error
+		skip   bool
 	)
 
-	switch field {
-	case FieldCategoryId:
-		column = data_object.FieldCategoryId
-	case FieldCategoryTitle:
-		column = data_object.FieldCategoryTitle
-	case FieldCategorySlug:
-		column = data_object.FieldCategorySlug
-	case FieldCategoryPublications:
-		skip = true
-	case FieldCategoryCreatedAt:
-		column = data_object.FieldCategoryCreatedAt
-	case FieldCategoryUpdatedAt:
-		column = data_object.FieldCategoryUpdatedAt
-	case FieldCategoryDeletedAt:
-		column = data_object.FieldCategoryDeletedAt
-	default:
-		err = fmt.Errorf("unknown category field: %s", field)
+	column = ci.fields()[field]
+	if column == "" {
+		err = fmt.Errorf("unknown field: %s", field)
 	}
 
 	return column, skip, err
@@ -87,7 +81,7 @@ func (ci categoryInterpretation) handleField(field string) (string, bool, error)
 func (ci categoryInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
 	args = checkDefaultPaginationArgs(args)
 
-	if args.OrderBy != nil {
+	if args.OrderBy == nil {
 		args.OrderBy = &[]string{
 			fmt.Sprintf("%s %s", data_object.FieldCategorySlug, DirDesc),
 		}

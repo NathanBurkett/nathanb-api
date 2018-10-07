@@ -1,6 +1,7 @@
 package criteria
 
 import (
+	"fmt"
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/graphql-go/selected"
 	"github.com/nathanburkett/nathanb-api/data_object"
@@ -14,19 +15,22 @@ type Criteria struct {
 }
 
 func New(model data_object.Model, args interface{}, fields []selected.SelectedField) AbstractCriteria {
+	builder := query.SelectBuilder{}
+
 	cri := &Criteria{
-		builder: query.SelectBuilder{}.PlaceholderFormat(query.Question),
+		builder:   builder.PlaceholderFormat(query.Question),
+		modelType: model,
 	}
 
-	if cri.determineModelInterpreter(model); cri.err != nil {
+	if cri.determineModelInterpreter(model); cri.Error() != nil {
 		return cri
 	}
 
-	if cri.interpreter.handleArgs(cri, args); cri.err != nil {
+	if cri.interpreter.handleArgs(cri, args); cri.Error() != nil {
 		return cri
 	}
 
-	if cri.extractFields(fields); cri.err != nil {
+	if cri.extractFields(fields); cri.Error() != nil {
 		return cri
 	}
 
@@ -47,22 +51,15 @@ func (c *Criteria) determineModelInterpreter(model data_object.Model) {
 }
 
 func (c *Criteria) extractFields(selectedFields []selected.SelectedField) {
-	if c.Error() != nil {
-		return
-	}
-
 	fields := c.extractFieldsFromSelectedFields(selectedFields)
 
 	var columns []string
 
 	for i := 0; i < len(fields); i++ {
-		if c.Error() != nil {
-			continue
-		}
-
 		column, skip, err := c.interpreter.handleField(fields[i])
 		if err != nil {
-			c.err = err
+			table := c.modelType.Table()
+			c.SetError(fmt.Errorf("%s table %v", table, err))
 			return
 		}
 
@@ -73,7 +70,7 @@ func (c *Criteria) extractFields(selectedFields []selected.SelectedField) {
 		columns = append(columns, column)
 	}
 
-	c.builder.Columns(columns...)
+	c.Fields(columns...)
 }
 
 func (c *Criteria) extractFieldsFromSelectedFields(selectedFields []selected.SelectedField) []string {
@@ -115,6 +112,10 @@ func (c *Criteria) Fields(fields ...string) AbstractCriteria {
 }
 
 func (c *Criteria) ToSql() (string, []interface{}, error) {
+	if c.err != nil {
+		return "", []interface{}(nil), c.err
+	}
+
 	return c.builder.ToSql()
 }
 

@@ -1,8 +1,8 @@
 package data_object
 
 import (
-	"time"
 	"github.com/satori/go.uuid"
+	"time"
 )
 
 const TableProfile = "profile"
@@ -31,4 +31,18 @@ type Profile struct {
 
 func (p Profile) Table() string {
 	return TableProfile
+}
+
+func (p Profile) Fields() []string {
+	return []string{
+		FieldProfileId,
+		FieldProfileFirstName,
+		FieldProfileLastName,
+		FieldProfileTwitterHandle,
+		FieldProfileGithubHandle,
+		FieldProfileUserId,
+		FieldProfileCreatedAt,
+		FieldProfileUpdatedAt,
+		FieldProfileDeletedAt,
+	}
 }

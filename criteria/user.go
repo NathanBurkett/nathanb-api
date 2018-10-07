@@ -5,6 +5,7 @@ import (
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/nathanb-api/data_object"
 	"github.com/satori/go.uuid"
+	"reflect"
 )
 
 const FieldUserId = FieldId
@@ -14,20 +15,27 @@ const FieldUserCreatedAt = FieldCreatedAt
 const FieldUserUpdatedAt = FieldUpdatedAt
 const FieldUserDeletedAt = FieldDeletedAt
 
-type FirstUserArgs struct {
+type SingleUserArgs struct {
 	ID    *uuid.UUID
 	Email *string
 }
 
 type userInterpretation struct{}
 
-func (ui userInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
-	if c.Error() != nil {
-		return
+func (userInterpretation) fields() map[string]string {
+	return map[string]string{
+		FieldUserId:             data_object.FieldUserId,
+		FieldUserEmail:          data_object.FieldUserEmail,
+		FieldUserPasswordDigest: data_object.FieldUserPasswordDigest,
+		FieldUserCreatedAt:      data_object.FieldUserCreatedAt,
+		FieldUserUpdatedAt:      data_object.FieldUserUpdatedAt,
+		FieldUserDeletedAt:      data_object.FieldUserDeletedAt,
 	}
+}
 
+func (ui userInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 	switch T := args.(type) {
-	case FirstUserArgs:
+	case SingleUserArgs:
 		ui.interpretFirstUserArgs(c, T)
 		break
 	case PaginationArgs:
@@ -35,11 +43,11 @@ func (ui userInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
 		interpretPaginationArgs(c, T)
 		break
 	default:
-		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
+		c.SetError(fmt.Errorf("unknown user argument type: %s", reflect.TypeOf(T)))
 	}
 }
 
-func (ui userInterpretation) interpretFirstUserArgs(criteria AbstractCriteria, args FirstUserArgs) {
+func (ui userInterpretation) interpretFirstUserArgs(criteria AbstractCriteria, args SingleUserArgs) {
 	if args.ID != nil {
 		criteria.Where(query.Eq{data_object.FieldUserId: args.ID})
 	}
@@ -56,27 +64,9 @@ func (ui userInterpretation) handleField(field string) (string, bool, error) {
 		skip   bool
 	)
 
-	switch field {
-	case FieldUserId:
-		column = data_object.FieldUserId
-		break
-	case FieldUserEmail:
-		column = data_object.FieldUserEmail
-		break
-	case FieldUserPasswordDigest:
-		column = data_object.FieldUserPasswordDigest
-		break
-	case FieldUserCreatedAt:
-		column = data_object.FieldUserCreatedAt
-		break
-	case FieldUserUpdatedAt:
-		column = data_object.FieldUserUpdatedAt
-		break
-	case FieldUserDeletedAt:
-		column = data_object.FieldUserDeletedAt
-		break
-	default:
-		err = fmt.Errorf("unknown user field: %s", field)
+	column = ui.fields()[field]
+	if column == "" {
+		err = fmt.Errorf("unknown field: %s", field)
 	}
 
 	return column, skip, err
@@ -84,6 +74,10 @@ func (ui userInterpretation) handleField(field string) (string, bool, error) {
 
 func (ui userInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
 	args = checkDefaultPaginationArgs(args)
+
+	if args.OrderBy == nil {
+		args.OrderBy = &[]string{}
+	}
 
 	return args
 }

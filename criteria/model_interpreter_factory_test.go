@@ -2,17 +2,12 @@ package criteria_test
 
 import (
 	"github.com/nathanburkett/nathanb-api/criteria"
+	"github.com/nathanburkett/nathanb-api/mock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/nathanburkett/nathanb-api/data_object"
 )
-
-type mockModel struct {}
-
-func (mockModel) Table() string {
-	return ""
-}
 
 func TestModelInterpreterBridge_Determine(t *testing.T) {
 	type args struct {
@@ -75,7 +70,7 @@ func TestModelInterpreterBridge_Determine(t *testing.T) {
 		{
 			name: "non model yields err",
 			args: args{
-				model: mockModel{},
+				model: mock.Model{},
 			},
 			wantErr: true,
 		},

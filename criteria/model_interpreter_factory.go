@@ -3,12 +3,14 @@ package criteria
 import (
 	"fmt"
 	"github.com/nathanburkett/nathanb-api/data_object"
+	"reflect"
 )
 
 type ModelInterpreter interface {
 	handleArgs(AbstractCriteria, interface{})
 	handleField(string) (string, bool, error)
 	checkDefaultPaginationArgs(PaginationArgs) PaginationArgs
+	fields() map[string]string
 }
 
 type ModelInterpreterFactory struct {}
@@ -35,7 +37,7 @@ func (ModelInterpreterFactory) Create(model data_object.Model) (ModelInterpreter
 	case data_object.User:
 		interpreter = userInterpretation{}
 	default:
-		err = fmt.Errorf("unknown data object type: %s", T)
+		err = fmt.Errorf("unknown data object type: %s", reflect.TypeOf(T))
 	}
 
 	return interpreter, err

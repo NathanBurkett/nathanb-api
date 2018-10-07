@@ -18,12 +18,23 @@ type Classification struct {
 	ID           uuid.UUID      `json:"id"`
 	Title        string         `json:"title"`
 	Slug         string         `json:"slug"`
-	Publications []*Publication  `json:"publications"`
+	Publications []*Publication `json:"publications"`
 	CreatedAt    time.Time      `json:"createdAt"`
 	UpdatedAt    time.Time      `json:"updatedAt"`
-	DeletedAt    time.Time `json:"deletedAt"`
+	DeletedAt    time.Time      `json:"deletedAt"`
 }
 
 func (c Classification) Table() string {
 	return TableClassification
+}
+
+func (c Classification) Fields() []string {
+	return []string{
+		FieldClassificationId,
+		FieldClassificationTitle,
+		FieldClassificationSlug,
+		FieldClassificationCreatedAt,
+		FieldClassificationUpdatedAt,
+		FieldClassificationDeletedAt,
+	}
 }

@@ -5,6 +5,7 @@ import (
 	query "github.com/Masterminds/squirrel"
 	"github.com/nathanburkett/nathanb-api/data_object"
 	"github.com/satori/go.uuid"
+	"reflect"
 )
 
 const FieldPublicationId = FieldId
@@ -15,21 +16,29 @@ const FieldPublicationCreatedAt = FieldCreatedAt
 const FieldPublicationUpdatedAt = FieldUpdatedAt
 const FieldPublicationDeletedAt = FieldDeletedAt
 
-type FirstPublicationArgs struct {
+type SinglePublicationArgs struct {
 	ID    *uuid.UUID
 	Title *string
 	Slug  *string
 }
 
-type publicationInterpretation struct {}
+type publicationInterpretation struct{}
+
+func (publicationInterpretation) fields() map[string]string {
+	return map[string]string{
+		FieldPublicationId:          data_object.FieldPublicationId,
+		FieldPublicationTitle:       data_object.FieldPublicationTitle,
+		FieldPublicationSlug:        data_object.FieldPublicationSlug,
+		FieldPublicationPublishedAt: data_object.FieldPublicationPublishedAt,
+		FieldPublicationCreatedAt:   data_object.FieldPublicationCreatedAt,
+		FieldPublicationUpdatedAt:   data_object.FieldPublicationUpdatedAt,
+		FieldPublicationDeletedAt:   data_object.FieldPublicationDeletedAt,
+	}
+}
 
 func (pi publicationInterpretation) handleArgs(c AbstractCriteria, args interface{}) {
-	if c.Error() != nil {
-		return
-	}
-
 	switch T := args.(type) {
-	case FirstPublicationArgs:
+	case SinglePublicationArgs:
 		pi.interpretFirstPublicationArgs(c, T)
 		break
 	case PaginationArgs:
@@ -37,11 +46,11 @@ func (pi publicationInterpretation) handleArgs(c AbstractCriteria, args interfac
 		interpretPaginationArgs(c, T)
 		break
 	default:
-		c.SetError(fmt.Errorf("unknown category argument type: %s", T))
+		c.SetError(fmt.Errorf("unknown publication argument type: %s", reflect.TypeOf(T)))
 	}
 }
 
-func (pi publicationInterpretation) interpretFirstPublicationArgs(criteria AbstractCriteria, args FirstPublicationArgs) {
+func (pi publicationInterpretation) interpretFirstPublicationArgs(criteria AbstractCriteria, args SinglePublicationArgs) {
 	if args.ID != nil {
 		criteria.Where(query.Eq{data_object.FieldPublicationId: args.ID})
 	}
@@ -58,34 +67,13 @@ func (pi publicationInterpretation) interpretFirstPublicationArgs(criteria Abstr
 func (pi publicationInterpretation) handleField(field string) (string, bool, error) {
 	var (
 		column string
-		err error
-		skip bool
+		err    error
+		skip   bool
 	)
 
-	switch field {
-	case FieldPublicationId:
-		column = data_object.FieldPublicationId
-		break
-	case FieldPublicationTitle:
-		column = data_object.FieldPublicationTitle
-		break
-	case FieldPublicationSlug:
-		column = data_object.FieldPublicationSlug
-		break
-	case FieldPublicationPublishedAt:
-		column = data_object.FieldPublicationPublishedAt
-		break
-	case FieldPublicationCreatedAt:
-		column = data_object.FieldPublicationCreatedAt
-		break
-	case FieldPublicationUpdatedAt:
-		column = data_object.FieldPublicationUpdatedAt
-		break
-	case FieldPublicationDeletedAt:
-		column = data_object.FieldPublicationDeletedAt
-		break
-	default:
-		err = fmt.Errorf("unknown publication field: %s", field)
+	column = pi.fields()[field]
+	if column == "" {
+		err = fmt.Errorf("unknown field: %s", field)
 	}
 
 	return column, skip, err
@@ -94,7 +82,7 @@ func (pi publicationInterpretation) handleField(field string) (string, bool, err
 func (pi publicationInterpretation) checkDefaultPaginationArgs(args PaginationArgs) PaginationArgs {
 	args = checkDefaultPaginationArgs(args)
 
-	if args.OrderBy != nil {
+	if args.OrderBy == nil {
 		args.OrderBy = &[]string{
 			fmt.Sprintf("%s %s", data_object.FieldPublicationPublishedAt, DirDesc),
 			fmt.Sprintf("%s %s", data_object.FieldPublicationCreatedAt, DirDesc),

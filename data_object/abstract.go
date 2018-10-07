@@ -7,5 +7,5 @@ const FieldDeletedAt = "deleted_at"
 
 type Model interface {
 	Table() string
+	Fields() []string
 }
-

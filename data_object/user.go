@@ -1,8 +1,8 @@
 package data_object
 
 import (
-	"time"
 	"github.com/satori/go.uuid"
+	"time"
 )
 
 const TableUser = "user"
@@ -27,4 +27,15 @@ type User struct {
 
 func (u User) Table() string {
 	return TableUser
+}
+
+func (u User) Fields() []string {
+	return []string{
+		FieldUserId,
+		FieldUserEmail,
+		FieldUserPasswordDigest,
+		FieldUserCreatedAt,
+		FieldUserUpdatedAt,
+		FieldUserDeletedAt,
+	}
 }
