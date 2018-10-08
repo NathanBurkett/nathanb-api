@@ -58,8 +58,7 @@ func (c *Criteria) extractFields(selectedFields []selected.SelectedField) {
 	for i := 0; i < len(fields); i++ {
 		column, skip, err := c.interpreter.handleField(fields[i])
 		if err != nil {
-			table := c.modelType.Table()
-			c.SetError(fmt.Errorf("%s table %v", table, err))
+			c.SetError(fmt.Errorf("%s table %v", c.modelType.Table(), err))
 			return
 		}
 

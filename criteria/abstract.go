@@ -14,7 +14,7 @@ const QualifierLT = "<"
 const QualifierLTE = "<="
 const QualifierGT = ">"
 const QualifierGTE = ">="
-const QualifierNotEq = "!="
+const QualifierNotEq = "<>"
 
 const DirDesc = "DESC"
 const DirAsc = "ASC"
@@ -23,8 +23,8 @@ const DefaultLimit = 10
 const DefaultPage = 1
 
 type WhereClause struct {
-	qualifier *string
-	value *interface{}
+	Qualifier *string
+	Value     *interface{}
 }
 
 func interpretWhereClauses(key string, clauses []WhereClause) []interface{} {
@@ -32,30 +32,30 @@ func interpretWhereClauses(key string, clauses []WhereClause) []interface{} {
 
 	for i := 0; i < len(clauses); i++ {
 		wc := clauses[i]
-		q := *wc.qualifier
+		q := *wc.Qualifier
 
 		switch q {
 		case QualifierEq:
-			retClauses = append(retClauses, query.Eq{key:  *wc.value})
+			retClauses = append(retClauses, query.Eq{key:  *wc.Value})
 			break
 		case QualifierLT:
-			retClauses = append(retClauses, query.Lt{key:  *wc.value})
+			retClauses = append(retClauses, query.Lt{key:  *wc.Value})
 			break
 		case QualifierLTE:
-			retClauses = append(retClauses, query.LtOrEq{key:  *wc.value})
+			retClauses = append(retClauses, query.LtOrEq{key:  *wc.Value})
 			break
 		case QualifierGT:
-			retClauses = append(retClauses, query.Gt{key:  *wc.value})
+			retClauses = append(retClauses, query.Gt{key:  *wc.Value})
 			break
 		case QualifierGTE:
-			retClauses = append(retClauses, query.GtOrEq{key:  *wc.value})
+			retClauses = append(retClauses, query.GtOrEq{key:  *wc.Value})
 			break
 		case QualifierNotEq:
-			retClauses = append(retClauses, query.NotEq{key:  *wc.value})
+			retClauses = append(retClauses, query.NotEq{key:  *wc.Value})
 			break
 		default:
 
-			retClauses = append(retClauses, query.Eq{key:  *wc.value})
+			retClauses = append(retClauses, query.Eq{key:  *wc.Value})
 		}
 	}
 
@@ -85,10 +85,6 @@ func interpretPaginationArgs(c AbstractCriteria, args PaginationArgs) {
 	}
 
 	for key, clauses := range *args.Where {
-		if c.Error() != nil {
-			return
-		}
-
 		column, shouldSkip, err := c.Interpreter().handleField(key)
 		if err != nil {
 			c.SetError(err)
