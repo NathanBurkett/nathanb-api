@@ -41,6 +41,12 @@
   revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
 
 [[projects]]
+  name = "github.com/nathanburkett/env"
+  packages = ["."]
+  revision = "ad7c399e75cb3ce3a08d34c1bb21660e715fed8f"
+  version = "0.0.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/nathanburkett/graphql-go"
   packages = [
@@ -84,19 +90,8 @@
   version = "v1.2.0"
 
 [[projects]]
-  name = "github.com/stretchr/objx"
-  packages = ["."]
-  revision = "477a77ecc69700c7cdeb1fa9e129548e1c1c393c"
-  version = "v0.1.1"
-
-[[projects]]
   name = "github.com/stretchr/testify"
-  packages = [
-    ".",
-    "assert",
-    "http",
-    "mock"
-  ]
+  packages = ["assert"]
   revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
   version = "v1.2.2"
 
@@ -115,6 +110,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "26a103b9f4172e96200719429c02c2aa43caf5dd5945fd124f4c9da7e60bd87c"
+  inputs-digest = "95526972aa1d545d170601b74134e5e33eb9fa043646103a8d303fe553ada1ce"
   solver-name = "gps-cdcl"
   solver-version = 1

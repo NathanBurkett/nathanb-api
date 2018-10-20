@@ -21,3 +21,7 @@
 [[constraint]]
   name = "github.com/stretchr/testify"
   version = "1.2.2"
+
+[[constraint]]
+  name = "github.com/nathanburkett/env"
+  version = "0.0.1"
